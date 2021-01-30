@@ -1,6 +1,5 @@
 install.packages("MASS")
 ?MASS
-??MASS
 
 library(MASS)
 attach(Boston)
@@ -14,12 +13,14 @@ summary(Boston)
 summary(Boston$rad)
 str(Boston)
 nrow(Boston)
-
+ncol(Boston)
+summary(Boston)
+summary(Boston$crim)
 
 
 install.packages("ISLR")
 library(ISLR)
-??ISLR
+?ISLR
 data(Auto)
 head(Auto)
 help(Auto)
@@ -28,6 +29,7 @@ fivenum(Auto$mpg)
 boxplot(Auto$mpg)
 mean(Auto$acceleration)
 boxplot(mean())
+mean(Auto$weight)
 
 dataEPI <- read.csv(file.choose(),header = T)
 dataEPI

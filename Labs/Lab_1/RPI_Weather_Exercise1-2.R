@@ -25,6 +25,8 @@ sorted.days <- order(Devanshoo_RPI_Weather['days'])
 sorted.days
 
 
+###
+
 read.csv(file.choose())
 data()
 read.csv(file.choose())
@@ -117,3 +119,39 @@ qqline(x)
 
 boxplot(EPI,land_d)
 qqplot(EPI,land_d)
+
+#Filtering
+EPI_SA <- EPI_data[EPI_data$EPI_regions %in% c('South Asia'), ]
+EPI_SA
+
+#GPW3_2010_Data#
+
+gpw3_2010 <- read.csv(file.choose())
+
+View(gpw3_2010)
+head(gpw3_2010)
+summary(gpw3_2010)
+
+boxplot(gpw3_2010$Continent, main = "Continents")
+boxplot(gpw3_2010$Resolution, main = "Resolution")
+boxplot(gpw3_2010$Continent, main = "Plot of Continents")
+
+
+# Water Treatment#
+
+water_treatment <- read.csv(file.choose())
+
+View(water_treatment)
+
+remove_na <- water_treatment[water_treatment=='?']<--NA
+remove_na
+removed_na <- na.omit(water_treatment)
+View(removed_na)
+
+water_treatment = removed_na
+
+View(water_treatment)
+
+(water_treatment_ph.e <- water_treatment[water_treatment$PH.E, ])
+fivenum(water_treatment$PH.E)
+boxplot(water_treatment_ssp$PH.E)

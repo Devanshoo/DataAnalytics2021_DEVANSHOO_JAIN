@@ -1,0 +1,32 @@
+###########------------------------Random Forest on Tiatanic Dataset--------------------_#####################
+
+install.packages("party")
+install.packages("titanic")
+library(rpart)
+library(titanic)
+library(randomForest)
+library(party)
+
+data(titanic_train)
+View(titanic_train)
+
+attach(titanic_train)
+
+survived <- rpart(titanic_train$Survived ~ ., data=titanic_train)
+survived
+
+rftree <- ctree(titanic_train$Survived~PassengerId+Pclass+Age+SibSp+Parch+Fare, data=titanic_train)
+plot(rftree)
+
+??hclust
+
+mat <- dist(titanic_train$Survived)
+mat
+
+mat <- mat[!is.na(mat)]
+
+cluster <- hclust(mat)
+plot(cluster)
+
+model <- randomForest(Survived ~ ., data = titanic_train, importance = TRUE)
+model

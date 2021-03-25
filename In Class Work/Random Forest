@@ -1,0 +1,189 @@
+# In-Class Work: Validation set example with Auto dataset
+# Devanshoo Jain
+
+
+# ISLR: Introduction to Statistical Learning with R textbook
+# Validation set example with Auto dataset.
+library(ISLR)
+library(MASS)
+library(boot)
+set.seed(1)
+
+# Reading the cv.glm documentation 
+
+??cv.glm
+
+# Reading the documentation for sample() function
+
+help("sample")
+
+train <- sample(392,196)
+print(train)
+
+# We use the subset option in the lm() function to fit a linear regression using, 
+# only the observations corresponding to the training set.
+
+#----------------------------------------------------------------------------------------#
+
+lm.fit <- lm(mpg~horsepower, data = Auto, subset = train)
+print(lm.fit)
+
+# Now we use predict() function to estimate the response for all 392 observations,
+# and we use the mean() function to calculate the MSE of the 196 observations in the 
+# validation set. Note that the -train selects only the observations that are not in,
+# the training set.
+
+attach(Auto)
+mean((mpg-predict(lm.fit,Auto))[-train]^2)
+
+# Therefore, the estimated test MSE for the linear regression fit is 24.59808
+# We can use the poly() function to estimate test error for the quadratic and cubic regression. 
+
+#----------------------------------------------------------------------------------------#
+
+# Quadratic regression line
+
+lm.fit2 <- lm(mpg~poly(horsepower,2), data = Auto, subset = train) 
+print(lm.fit2)
+
+mean((mpg-predict(lm.fit2,Auto))[-train]^2)
+
+#----------------------------------------------------------------------------------------#
+
+# Cubic regression line
+
+lm.fit3 <- lm(mpg~poly(horsepower,3), data = Auto, subset = train)
+print(lm.fit3)
+
+mean((mpg-predict(lm.fit3,Auto))[-train]^2)
+
+# The error rates are: 19.63309 for quadratics and 19.64655 for cubic
+
+#----------------------------------------------------------------------------------------#
+
+# If we choose different training set instead, then we will obtain somewhat different errors, 
+# on the validation set.
+
+set.seed(2)
+train = sample(392,196)
+lm.fit <- lm(mpg~horsepower, data = Auto, subset = train) 
+mean((mpg-predict(lm.fit,Auto))[-train]^2)
+
+# the error rate is 25.72651
+
+lm.fit2 <- lm(mpg~poly(horsepower,2), data = Auto, subset = train) # Quadratic 
+mean((mpg-predict(lm.fit2,Auto))[-train]^2)
+
+# the error rate is 20.43036
+
+lm.fit3 <- lm(mpg~poly(horsepower,3), data = Auto, subset = train) # Cubic 
+mean((mpg-predict(lm.fit3,Auto))[-train]^2)
+
+# the error rate is 20.38533
+
+# The model that predict mpg using a quadratic function of horsepower performs better,
+# than a models that only involves only a linear function of horsepower, and there is a,
+# little evidence in favor of a model that uses a cubic function of horsepower.
+
+#----------------------------------------------------------------------------------------#
+
+# Random Forest example
+
+install.packages("randomForest")
+library(randomForest)
+mld <- read.csv("/Users/devanshoojain/RPI Sem 1/Data Analytics ITWS 6400/Data Sets/car.data")
+head(mld)
+summary(mld)
+
+colnames(mld) <- c("Buyingprice", "Maint", "Numdoors", "Numpersons", "Bootspace", "Safety", "Condition")
+
+View(mld)
+str(mld)
+
+levels(mld$Condition)
+
+# Now we are creating a data set and a validation data set in the ratio 70:30
+
+set.seed(100)
+train <- sample(nrow(mld), 0.7*nrow(mld), replace = FALSE)
+print(train)
+trainset <- mld[train,]
+validset <- mld[-train,]
+print(trainset)
+print(validset)
+
+summary(trainset)
+summary(validset)
+
+??randomforest
+
+modelrandforest <- randomForest(Condition ~., data= trainset, importance = TRUE)
+modelrandforest
+
+plot(modelrandforest)
+
+# Increasing mtry from 2 to 6
+
+modelrandforest1 <- randomForest(Condition ~., data= trainset, mtry= 6, ntree= 500, importance = TRUE)
+modelrandforest1
+
+plot(modelrandforest1)
+
+# Prediction using training dataset
+
+predtrainset <- predict(modelrandforest, trainset, type = 'class')
+table(predtrainset, trainset$Condition)
+
+# Prediction using validation dataset
+
+predvalidset <- predict(modelrandforest, validset, type = 'class')
+table(predvalidset, validset$Condition)
+
+# Checking Importance
+
+importance(modelrandforest)
+varImpPlot(modelrandforest)
+
+# Checking different values of mtry. 
+
+a =c() 
+i = 5 
+
+for (i in 3:8) {
+
+modelrandforest2 <- randomForest(Condition ~., data = trainset, ntree=500, mtry = i, importance=TRUE) 
+predValid <- predict(modelrandforest2, validset, type ="class") 
+a[i-2] = mean(predValid == validset$Condition) 
+
+} 
+
+modelrandforest2
+
+a
+plot(modelrandforest2) 
+
+ 
+# Comparing Randomforest with Decision Tree 
+
+install.packages("caret")
+install.packages("el071")
+
+library(rpart) 
+library(caret)
+library(e1071) 
+
+model_dt <- train(Condition ~., data=trainset, method = 'rpart')
+model_dt_1 <- pred(model_dt, data=trainset)
+
+
+table(model_dt_1, trainset$Condition) 
+mean(model_dt_1 == trainset$Condition) 
+table(model_dt_1,trainset$Condition) 
+mean(model_dt_1 == trainset$Condition) 
+
+
+# Now, look at the validation Dataset. 
+
+model_dt_vs = predict(model_dt, newdata = validset) 
+table(model_dt_vs, validset$Condition) 
+mean(model_dt_vs == validset$Condition)

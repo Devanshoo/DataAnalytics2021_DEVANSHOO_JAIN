@@ -1,0 +1,120 @@
+
+##################-----------------------PCA ON USArrests DATASET------------------#############################
+
+# In this lab, we perform PCA on the USArrests data set, which is part of the base R package. 
+# The rows of the data set contain the 50 states, in alphabetical order.
+# We will use the USAArrest data that available on RStudio
+data("USArrests")
+
+states=row.names(USArrests) 
+states
+# The columns of the data set contain the four variables.
+names(USArrests )
+
+#Calculating mean for all the variables
+apply(USArrests,2, mean)
+
+#Calculating variance for all the variables
+apply(USArrests,2, var)
+
+#Principal Components Analysis using the prcomp() function
+??prcomp
+pr.out=prcomp(USArrests, scale=TRUE)
+pr.out
+names(pr.out)
+
+# The center and scale components correspond to the means and standard deviations of the 
+# variables that were used for scaling prior to implementing PCA.
+# The rotation matrix provides the principal component loadings
+pr.out$center
+pr.out$scale
+pr.out$rotation
+
+#Finding dimensions of the PCA
+dim(pr.out$x)
+
+# Ploting the first two principal components as follows:
+
+biplot(pr.out, scale=0)
+pr.out$sdev
+
+# The variance explained by each principal component is obtained by squaring these:
+pr.var = pr.out$sdev^2
+pr.var
+
+# To compute the propotion of variance explained by each principal component, we simply
+# devide the variance explained by each principal component by the total variance explained
+# by all four principal components.
+pve = pr.var/sum(pr.var)
+pve
+
+
+##################-----------------------PCA ON IRIS DATASET------------------#############################
+
+data("iris")
+head(iris)
+summary(iris)
+
+# creating another dataset from iris dataset with coloumn 1 to 4
+
+irisdata1 <- iris[,1:4]
+irisdata1
+head(irisdata1)
+
+pca <- princomp(irisdata1, cor = TRUE, score = TRUE)
+pca
+
+# cor lets us choose correlation matrix or covariance matrix
+# score is a logical value indicating whether the score on  
+# each principal component should be calculated.
+
+summary(pca)
+
+# We can see that it has four Principal Components as the input data also have four different features.
+
+#Component 1 represent the 72.9% and Component 2 represent the 22.8% of the variation of the data
+# The first two components which are component 1 and 2 collectively represent 95.7% 
+
+# Plotting PCA
+
+plot(pca)
+
+# plotting the principal_components using the a line in plot() functions 
+
+plot(pca, type = "l")
+
+#Biplot
+
+help("biplot")
+biplot(pca)
+
+##################-----------------------PCA ON BOSTON DATASET------------------#############################
+
+
+install.packages('MASS')
+data(Boston, package="MASS")
+help(Boston)
+??Boston
+
+# Principal Component Analysis using prcomp
+help(prcomp)
+pca_pr <- prcomp(Boston,scale. = T)
+pca_pr
+plot(pca_pr)
+
+# biplot()
+
+biplot(pca_pr, scale = 0)
+boston_pc <- pca_pr$x
+boston_pc
+
+# boston_pc has the Principal Components having the same number of rows in the original dataset
+
+head(boston_pc)
+summary(boston_pc)
+
+summary(pca_pr)
+
+# We can see from the above summary that first 5 components make 80% of the variance
+
+
